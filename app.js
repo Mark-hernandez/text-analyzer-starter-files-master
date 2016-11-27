@@ -1,5 +1,9 @@
+function add(a, b) {
+  return a + b;
+}
+
 function getAverageWordsPerSentence(text) {
-  var numSentences = text.match(/[.!?]+/g) ? text.match(/[.!?]+/g).length : 1;
+  var numSentences = text.split(/[!.?]+/).filter(Boolean).length;;
   var wordCount = tokenizeText(text).length;
   return (wordCount / numSentences).toFixed(2);
 }
@@ -9,49 +13,37 @@ function getAverageWordLength(tokens) {
   return (totalLength / tokens.length).toFixed(2);
 }
 
-function countDistinctWords(tokens) {
-  var distinctWords = [];
-  for (var i=0; i<tokens.length; i++) {
-    if (distinctWords.indexOf(tokens[i]) === -1) {
-      distinctWords.push(tokens[i]);
-    }
-  }
-  return distinctWords.length;
+function countTotalWords(tokens) {
+  return tokens.length;
 }
 
+function countDistinctWords(tokens) {
+  var distinctWords = new Set(tokens);
+  return distinctWords.size;
+}
 
 function tokenizeText(text) {
-  return text.toLowerCase().match(/\b[^\s]+\b/g).sort();
+  return text.toLowerCase().split(/[ ,!.";:-]+/).filter(Boolean).sort();
 }
-
 
 function removeReturns(text) {
   return text.replace(/\r?\n|\r/g, "");
 }
 
-
-
-
-
 function reportOnText(text) {
-  
   var tokens = tokenizeText(text);
   var numDistinctWords = countDistinctWords(tokens);
-  var numTotalWords = tokens.length;
+  var numTotalWords = countTotalWords(tokens);
   var averageWordLength = getAverageWordLength(tokens);
   var averageWordsPerSentence = getAverageWordsPerSentence(text);
 
-  
-  var textReport = $('.js-text-report');
+  var textReport = $('.js-text-report')
   textReport.find('.js-word-count').text(numTotalWords);
   textReport.find('.js-unique-word-count').text(numDistinctWords);
-  textReport.find('.js-average-word-length').text(
-    averageWordLength + " characters");
-  textReport.find('.js-average-sentence-length').text(
-    averageWordsPerSentence + " words");
-  textReport.removeClass('hidden');
+  textReport.find('.js-average-word-length').text(averageWordLength + " characters");
+  textReport.find('.js-average-sentence-length').text(averageWordsPerSentence + " words");
+  textReport.removeClass("hidden");
 }
-
 
 function watchFormSubmission() {
   $('.js-text-form').submit(function(event) {
@@ -60,7 +52,6 @@ function watchFormSubmission() {
     reportOnText(removeReturns(userText));
   });
 }
-
 
 $(function() {
   watchFormSubmission();
